@@ -25,14 +25,5 @@
  * @package ImageAnalysis
  */
 
-return array(
-    'ezcImageAnalyzerException'                   => 'ImageAnalysis/exceptions/exception.php',
-    'ezcImageAnalyzerFileNotProcessableException' => 'ImageAnalysis/exceptions/file_not_processable.php',
-    'ezcImageAnalyzerInvalidHandlerException'     => 'ImageAnalysis/exceptions/invalid_handler.php',
-    'ezcImageAnalyzerHandler'                     => 'ImageAnalysis/interfaces/handler.php',
-    'ezcImageAnalyzer'                            => 'ImageAnalysis/analyzer.php',
-    'ezcImageAnalyzerData'                        => 'ImageAnalysis/structs/analyzer_data.php',
-    'ezcImageAnalyzerImagemagickHandler'          => 'ImageAnalysis/handlers/imagemagick.php',
-    'ezcImageAnalyzerPhpHandler'                  => 'ImageAnalysis/handlers/php.php',
-);
+return ['ezcImageAnalyzerException'                   => 'ImageAnalysis/exceptions/exception.php', 'ezcImageAnalyzerFileNotProcessableException' => 'ImageAnalysis/exceptions/file_not_processable.php', 'ezcImageAnalyzerInvalidHandlerException'     => 'ImageAnalysis/exceptions/invalid_handler.php', 'ezcImageAnalyzerHandler'                     => 'ImageAnalysis/interfaces/handler.php', 'ezcImageAnalyzer'                            => 'ImageAnalysis/analyzer.php', 'ezcImageAnalyzerData'                        => 'ImageAnalysis/structs/analyzer_data.php', 'ezcImageAnalyzerImagemagickHandler'          => 'ImageAnalysis/handlers/imagemagick.php', 'ezcImageAnalyzerPhpHandler'                  => 'ImageAnalysis/handlers/php.php'];
 ?>

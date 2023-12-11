@@ -164,25 +164,12 @@ class ezcImageAnalyzerPhpHandler extends ezcImageAnalyzerHandler
      * @param string $mime The MIME type to check for.
      * @return bool True if the handler is able to analyze the MIME type.
      */
-    public function canAnalyze( $mime )
+    public function canAnalyze($mime)
     {
-        switch ( $mime )
-        {
-            case 'image/gif':
-            case 'image/jpeg':
-            case 'image/png':
-            case 'image/psd':
-            case 'image/bmp':
-            case 'image/tiff':
-            case 'image/tiff':
-            case 'image/jp2':
-            case 'application/x-shockwave-flash':
-            case 'image/iff':
-            case 'image/vnd.wap.wbmp':
-            case 'image/xbm':
-                return true;
-        }
-        return false;
+        return match ($mime) {
+            'image/gif', 'image/jpeg', 'image/png', 'image/psd', 'image/bmp', 'image/tiff', 'image/tiff', 'image/jp2', 'application/x-shockwave-flash', 'image/iff', 'image/vnd.wap.wbmp', 'image/xbm' => true,
+            default => false,
+        };
     }
 
     /**
@@ -225,7 +212,7 @@ class ezcImageAnalyzerPhpHandler extends ezcImageAnalyzerHandler
         if ( isset( $dataStruct->exif['COMPUTED']['UserComment'] ) )
         {
             $dataStruct->comment = $dataStruct->exif['COMPUTED']['UserComment'];
-            $dataStruct->commentList = array( $dataStruct->comment );
+            $dataStruct->commentList = [$dataStruct->comment];
         }
         if ( isset( $dataStruct->exif['COMPUTED']['Copyright'] ) )
         {
@@ -283,13 +270,13 @@ class ezcImageAnalyzerPhpHandler extends ezcImageAnalyzerHandler
             throw new ezcImageAnalyzerFileNotProcessableException( $file, 'Not a valid GIF image file' );
         }
 
-        $info = array();
+        $info = [];
 
         $version = substr( $magic, 3 );
         $frames = 0;
         // Gifs are always indexed
         $dataStruct->mode             = self::MODE_INDEXED;
-        $dataStruct->commentList      = array();
+        $dataStruct->commentList      = [];
         $dataStruct->transparencyType = self::TRANSPARENCY_OPAQUE;
 
         // Read Logical Screen Descriptor

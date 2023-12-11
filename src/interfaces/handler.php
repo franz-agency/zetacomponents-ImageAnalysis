@@ -38,27 +38,27 @@ abstract class ezcImageAnalyzerHandler
     /**
      * Image is built with a palette and consists of indexed values per pixel.
      */
-    const MODE_INDEXED = 1;
+    public const MODE_INDEXED = 1;
 
     /**
      * Image consists of RGB value per pixel.
      */
-    const MODE_TRUECOLOR = 2;
+    public const MODE_TRUECOLOR = 2;
 
     /**
      * No parts of image is transparent.
      */
-    const TRANSPARENCY_OPAQUE = 1;
+    public const TRANSPARENCY_OPAQUE = 1;
 
     /*
      * Selected palette entries are completely see-through.
      */
-    const TRANSPARENCY_TRANSPARENT = 2;
+    public const TRANSPARENCY_TRANSPARENT = 2;
 
     /**
      * Transparency determined pixel per pixel with a fuzzy value.
      */
-    const TRANSPARENCY_TRANSLUCENT = 3;
+    public const TRANSPARENCY_TRANSLUCENT = 3;
 
     /**
      * Options for the handler.
@@ -68,7 +68,7 @@ abstract class ezcImageAnalyzerHandler
      *
      * @var array(string=>mixed)
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Create an ezcImageAnalyzerHandler to analyze a file.
@@ -81,7 +81,7 @@ abstract class ezcImageAnalyzerHandler
      *         If the handler is not able to work.
      * @param array $options Possible options for the handler.
      */
-    public function __construct( array $options = array() )
+    public function __construct( array $options = [] )
     {
         $this->options = $options;
     }

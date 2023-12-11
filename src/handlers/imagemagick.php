@@ -80,7 +80,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
      *
      * @var array(string=>string)
      */
-    protected $mimeMap = array(
+    protected $mimeMap = [
         'bmp'   => 'image/bmp',
         'bmp2'  => 'image/bmp',
         'bmp3'  => 'image/bmp',
@@ -154,7 +154,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
         'xpm'   => 'image/x-xbitmap',
         'xv'    => 'image/x-viff',
         'xwd'   => 'image/xwd',
-    );
+    ];
 
     /**
      * MIME types this handler is capable to read.
@@ -166,7 +166,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
      *
      * @var array(string=>bool)
      */
-    protected $mimeTypes = array(
+    protected $mimeTypes = [
         'application/pcl' => true,
         'application/pdf' => true,
         'application/postscript' => true,
@@ -210,7 +210,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
         'video/mng' => true,
         'video/mpeg' => true,
         'video/mpeg2' => true,
-    );
+    ];
 
     /**
      * Analyzes the image type.
@@ -228,12 +228,12 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
     {
         $format = ( ezcBaseFeatures::os() === 'Windows' ? '"%m|"' : escapeshellarg( '%m|' ) );
         $parameters = '-format ' . $format . ' ' . escapeshellarg( $file );
-        $res = ezcImageAnalyzerImagemagickHandler::runCommand( $parameters, $outputString, $errorString );
+        $res = (new ezcImageAnalyzerImagemagickHandler())->runCommand($parameters, $outputString, $errorString);
         if ( $res !== 0 || $errorString !== '' )
         {
             return false;
         }
-        $identifiers = explode( '|', strtolower( $outputString ), 2 );
+        $identifiers = explode( '|', strtolower( (string) $outputString ), 2 );
         if ( !isset( $this->mimeMap[$identifiers[0]] ) )
         {
             return false;
@@ -292,7 +292,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
 
         $dataStruct = new ezcImageAnalyzerData();
 
-        $rawDataArr = explode( '*', $outputString );
+        $rawDataArr = explode( '*', (string) $outputString );
         if ( sizeof( $rawDataArr ) === 1 )
         {
             throw new ezcImageAnalyzerFileNotProcessableException( $file, "ImageMagick did not return correct formated string." );
@@ -318,7 +318,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
             $dataStruct->isColor  = $parsedData[4] > 2 ? true : false;
 
             $dataStruct->transparencyType = self::TRANSPARENCY_OPAQUE;
-            if ( strpos( $parsedData[5], 'RGBMatte' ) !== FALSE )
+            if ( str_contains( $parsedData[5], 'RGBMatte' ) )
             {
                 $dataStruct->transparencyType = self::TRANSPARENCY_TRANSPARENT;
             }
@@ -332,7 +332,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
                 else
                 {
                     $dataStruct->comment = $parsedData[6];
-                    $dataStruct->commentList = array( $parsedData[6] );
+                    $dataStruct->commentList = [$parsedData[6]];
                 }
             }
 
@@ -358,8 +358,8 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
      */
     protected function analyzeExif( ezcImageAnalyzerData $data, $file )
     {
-        $tagMap = array(
-            "IFD0" => array(
+        $tagMap = [
+            "IFD0" => [
                 "ImageDescription",
                 "Make",
                 "Model",
@@ -373,9 +373,9 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
                 "Exif_IFD_Pointer",
                 "Copyright",
                 "UserComment",
-            ),
+            ],
 
-            "EXIF" => array(
+            "EXIF" => [
                 "ExposureTime",
                 "FNumber",
                 "ExposureProgram",
@@ -413,12 +413,12 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
                 "Saturation",
                 "Sharpness",
                 "SubjectDistanceRange",
-            ),
-            "INTEROP" => array(
+            ],
+            "INTEROP" => [
                 "InterOperabilityIndex",
                 "InterOperabilityVersion"
-            )
-        );
+            ]
+        ];
 
         // Retreive exif data
         $command = '-format ' . escapeshellarg( "%[EXIF:*]"  ) . ' ' . escapeshellarg( $file );
@@ -431,14 +431,14 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
         // The following is done in 2 steps to ensure the same array order as ext/exif provides.
 
         // Pre-process data
-        $rawData = explode( "\n", $outputString );
-        $dataArr = array();
+        $rawData = explode( "\n", (string) $outputString );
+        $dataArr = [];
         foreach ( $rawData as $dataString )
         {
             $dataParts = explode( "=", $dataString, 2 );
             if ( sizeof( $dataParts ) === 2 )
             {
-                $dataArr[$dataParts[0]] = substr( $dataParts[1], -1, 1 ) === "." ? substr( $dataParts[1], 0, -1 ) : $dataParts[1];
+                $dataArr[$dataParts[0]] = str_ends_with($dataParts[1], ".") ? substr( $dataParts[1], 0, -1 ) : $dataParts[1];
             }
         }
         // Some post-processing is needed because ext/exif has some different tag names
@@ -460,7 +460,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
         }
 
         // Assign data to tags
-        $exifArr = array();
+        $exifArr = [];
         foreach ( $tagMap as $section => $tags )
         {
             foreach ( $tags as $tag )
@@ -468,18 +468,11 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
                 if ( isset( $dataArr[$tag] ) )
                 {
                     // Correct types
-                    switch ( true )
-                    {
-                        case ( ctype_digit( $dataArr[$tag] ) && stripos( $tag, "version" ) === false ):
-                            $exifArr[$section][$tag] = (int)$dataArr[$tag];
-                            break;
-                        case ( is_numeric( $dataArr[$tag] ) && stripos( $tag, "version" ) === false ):
-                            $exifArr[$section][$tag] = (float)$dataArr[$tag];
-                            break;
-                        default:
-                            $exifArr[$section][$tag] = $dataArr[$tag];
-                            break;
-                    }
+                    $exifArr[$section][$tag] = match (true) {
+                        ctype_digit( $dataArr[$tag] ) && stripos( $tag, "version" ) === false => (int)$dataArr[$tag],
+                        is_numeric( $dataArr[$tag] ) && stripos( $tag, "version" ) === false => (float)$dataArr[$tag],
+                        default => $dataArr[$tag],
+                    };
                 }
             }
         }
@@ -496,7 +489,7 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
         }
 
         // Compute additional section ext/EXIF provides
-        $additionsArr = array();
+        $additionsArr = [];
         $addtionsArr["FILE"]["FileName"]               =  basename( $file );
         $addtionsArr["FILE"]["FileDateTime"]           =  filemtime( $file );
         $addtionsArr["FILE"]["FileSize"]               =  filesize( $file );
@@ -605,11 +598,11 @@ class ezcImageAnalyzerImagemagickHandler extends ezcImageAnalyzerHandler
         $command = ( ezcBaseFeatures::os() === 'Windows' ? $this->binary : escapeshellcmd( $this->binary ) )
             . ( $parameters !== '' ?  ' ' . $parameters : '' );
         // Prepare to run ImageMagick command
-        $descriptors = array(
-            array( 'pipe', 'r' ),
-            array( 'pipe', 'w' ),
-            array( 'pipe', 'w' ),
-        );
+        $descriptors = [
+            ['pipe', 'r'],
+            ['pipe', 'w'],
+            ['pipe', 'w'],
+        ];
 
         // Open ImageMagick process
         $process = proc_open( $command, $descriptors, $pipes );

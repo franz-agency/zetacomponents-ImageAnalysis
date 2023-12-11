@@ -139,10 +139,7 @@ class ezcImageAnalyzer
      *
      * @var array(string=>mixed)
      */
-    protected static $knownHandlers = array(
-        'ezcImageAnalyzerPhpHandler' => array(),
-        'ezcImageAnalyzerImagemagickHandler' => array(),
-    );
+    protected static $knownHandlers = ['ezcImageAnalyzerPhpHandler' => [], 'ezcImageAnalyzerImagemagickHandler' => []];
 
     /**
      * Available handler classes and their options.
@@ -196,7 +193,7 @@ class ezcImageAnalyzer
         {
             return;
         }
-        ezcImageAnalyzer::$availableHandlers = array();
+        ezcImageAnalyzer::$availableHandlers = [];
         foreach ( ezcImageAnalyzer::$knownHandlers as $handlerClass => $options )
         {
             if ( !ezcBaseFeatures::classExists( $handlerClass ) || !is_subclass_of( $handlerClass, 'ezcImageAnalyzerHandler' ) )
@@ -251,10 +248,9 @@ class ezcImageAnalyzer
      * @throws ezcBasePropertyPermissionException
      *         If the property cannot be modified.
      * @param string $name
-     * @param mixed $value
      * @ignore
      */
-    public function __set( $name, $value )
+    public function __set( $name, mixed $value )
     {
         switch ( $name )
         {
@@ -301,14 +297,10 @@ class ezcImageAnalyzer
      */
     public function __isset( $name )
     {
-        switch ( $name )
-        {
-            case 'mime':
-            case 'data':
-                return true;
-            default:
-                return false;
-        }
+        return match ($name) {
+            'mime', 'data' => true,
+            default => false,
+        };
     }
 
     /**
